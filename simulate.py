@@ -17,11 +17,11 @@ def main(argv):
 
     # Do some default simulation
     if not argv:
-        s = BackupSimulator(parse_deltas('1d 7d 30d'))
+        s = BackupSimulator(parse_deltas('1h 1d;12h 7d;1d 30d'))
 
-        until = s.now + timedelta(days=17)
+        until = s.now + timedelta(days=90)
         while s.now <= until:
-            s.go_by(timedelta(days=1))
+            s.go_by(timedelta(hours=1))
             s.backup()
 
         for name, date in s.backups.iteritems():
@@ -29,7 +29,7 @@ def main(argv):
 
     # Simulate a backup with the timestamps given
     else:
-        s = BackupSimulator(parse_deltas('1d 7d 30d'))
+        s = BackupSimulator(parse_deltas('1h 1d;12h 7d;1d 30d'))
         s.add([d for d in argv])
         deleted, _ = s.expire()
 
