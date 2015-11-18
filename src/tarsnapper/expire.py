@@ -66,7 +66,7 @@ def expire(backups, deltas):
         current_delta = deltas.pop()
 
         # (1) Start from the point in time where the current generation ends.
-        dt_pointer = most_recent_backup - last_delta
+        dt_pointer = most_recent_backup - last_delta[0]
         last_selected = None
         while dt_pointer < most_recent_backup:
             # (2) Find the backup that matches the current position best.
@@ -83,13 +83,13 @@ def expire(backups, deltas):
                     # this loop determine the same backup to be closest.
                     # In this case, to avoid looping endlessly, we need to
                     # force the date pointer to move forward.
-                    dt_pointer += current_delta
+                    dt_pointer += current_delta[1]
                 else:
                     last_selected = by_dist[0][0]
                     to_keep.add(by_dist[0][0])
                     # (3) Proceed forward in time, jumping by the current
-                    # generation's delta.
-                    dt_pointer = by_dist[0][1] + current_delta
+                    # generation's delta time step.
+                    dt_pointer = by_dist[0][1] + current_delta[1]
             else:
                 # No more backups found in this generation.
                 break
