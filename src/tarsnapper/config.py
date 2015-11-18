@@ -15,12 +15,17 @@ like this:
         sources:
           - /var/dir/1
           - /etc/google
-        target: /custom-target-$date.zip
+        target: /custom-target-$date
         deltas: 1h 6h 1d 7d 24d 180d
 
       important-job:
         source: /important/
         delta: important
+
+      yet-another-job:
+        source: /foo/
+        deltas: 1h 1d;12h 7d;1d 120d
+
 """
 
 from datetime import timedelta
@@ -80,24 +85,37 @@ def str_to_timedelta(text):
 
 
 def parse_deltas(delta_string):
-    """Parse the given string into a list of ``timedelta`` instances.
+    """Parse the given string into a list of (``timedelta``, ``timedelta``) instances.
+    representing time and step size
     """
     if delta_string is None:
         return None
 
     deltas = []
-    for item in delta_string.split(' '):
-        item = item.strip()
-        if not item:
+    for delta_item in delta_string.split(' '):
+        delta_item = delta_item.strip()
+        if not delta_item:
             continue
+
+        if delta_item.find(';') == -1:
+            time = delta_item
+            step = delta_item
+        else:
+            items = delta_item.split(';')
+            if len(items) != 2:
+                raise ConfigError('Not a valid delta: %s' % e)
+            time = items[0]
+            step = items[1]
+
         try:
-            deltas.append(str_to_timedelta(item))
+            delta_time =  str_to_timedelta(time)
+            delta_step =  str_to_timedelta(step)
+            deltas.append((delta_time, delta_step))
         except ValueError, e:
             raise ConfigError('Not a valid delta: %s' % e)
 
     if deltas and len(deltas) < 2:
         raise ConfigError('At least two deltas are required')
-
     return deltas
 
 def parse_named_deltas(named_delta_dict):
