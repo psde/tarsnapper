@@ -17,7 +17,7 @@ def main(argv):
 
     # Do some default simulation
     if not argv:
-        s = BackupSimulator(parse_deltas('1h 1d;12h 7d;1d 30d'))
+        s = BackupSimulator(parse_deltas('1h 1d;12h 7d;1d 14d;7d 30d;14d 90d'))
 
         until = s.now + timedelta(days=90)
         while s.now <= until:
