@@ -93,6 +93,14 @@ def test_no_deltas():
         target:  $date
     """)
 
+def test_invalid_delta():
+    assert_raises(ConfigError, load_config, """
+    deltas: 1d 2d;2h 3d; 50d
+    jobs:
+      foo:
+        sources: /etc
+        target: $date
+    """)
 
 def test_global_deltas():
     assert len(load_config("""
